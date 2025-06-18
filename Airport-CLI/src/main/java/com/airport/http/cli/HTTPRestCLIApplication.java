@@ -1,4 +1,4 @@
-package com.airport.Domain.http.cli;
+package com.airport.http.cli;
 
 public class HTTPRestCLIApplication {
     
