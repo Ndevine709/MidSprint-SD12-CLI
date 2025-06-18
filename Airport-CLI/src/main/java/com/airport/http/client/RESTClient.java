@@ -2,6 +2,7 @@ package com.airport.http.client;
 
 import com.airport.domain.Passenger;
 import com.airport.domain.Aircraft;
+import com.airport.domain.City;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -58,6 +59,10 @@ public class RESTClient {
 
     public List<Aircraft> buildAircraftListFromResponse(String json) throws IOException {
         return mapper.readValue(json, new TypeReference<List<Aircraft>>() {});
+    }
+
+    public List<City> buildCitiesListFromResponse(String json) throws IOException {
+        return mapper.readValue(json, new TypeReference<List<City>>() {});
     }
 
     public List<Passenger> getAllPassengers() {
