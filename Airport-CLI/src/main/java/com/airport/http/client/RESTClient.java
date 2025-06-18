@@ -3,6 +3,7 @@ package com.airport.http.client;
 import com.airport.domain.Passenger;
 import com.airport.domain.Aircraft;
 import com.airport.domain.City;
+import com.airport.domain.Airport;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -65,6 +66,10 @@ public class RESTClient {
         return mapper.readValue(json, new TypeReference<List<City>>() {});
     }
 
+    public List<Airport> buildAirportListFromResponse(String json) throws IOException {
+        return mapper.readValue(json, new TypeReference<List<Airport>>() {});
+    }
+
     public List<Passenger> getAllPassengers() {
         List<Passenger> list = new ArrayList<>();
         HttpRequest req = HttpRequest.newBuilder()
@@ -92,4 +97,34 @@ public class RESTClient {
         }
         return list;
     }
+
+    public List<Airport> getAllAirports(){
+        List<Airport> list = new ArrayList<>();
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(serverURL + "/airport"))
+            .GET().build();
+        try{
+            HttpResponse<String> response = httpSender(request);
+            list = buildAirportListFromResponse(response.body());
+        } catch (IOException | InterruptedException exception){
+            exception.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Airport> getAirportsByCityId(Long cityId){
+        List<Airport> list = new ArrayList<>();
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(serverURL + "/airport/city/" + cityId))
+            .GET()
+            .build();
+        try{
+            HttpResponse<String> response = httpSender(request);
+            list = buildAirportListFromResponse(response.body());
+        } catch (IOException | InterruptedException exception){
+            exception.printStackTrace();
+        }
+        return list;
+    }
+
 }
