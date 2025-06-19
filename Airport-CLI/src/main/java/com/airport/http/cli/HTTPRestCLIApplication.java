@@ -76,6 +76,27 @@ public class HTTPRestCLIApplication {
     }
 
     public void printAirportsByAircraft() {
+        // Fetch every aircraft (each one comes with its airports set)
+        List<Aircraft> all = getRestClient().getAllAircraft();
+
+        if (all.isEmpty()) {
+            System.out.println("No aircraft found.");
+            return;
+        }
+
+        for (Aircraft a : all) {
+            System.out.println("\nAircraft Tail #: " + a.getTailNumber());
+            System.out.println("  - Allowed to use:");
+            if (a.getAirports() == null || a.getAirports().isEmpty()) {
+                System.out.println("     * (none)");
+            } else {
+                for (Airport ap : a.getAirports()) {
+                    System.out.printf("     * %s (%s)%n",
+                            ap.getName(),
+                            ap.getCode());
+                }
+            }
+        }
     }
 
     public void printAirportsUsedByPassengers() {

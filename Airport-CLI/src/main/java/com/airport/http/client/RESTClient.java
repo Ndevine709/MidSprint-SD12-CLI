@@ -23,12 +23,13 @@ public class RESTClient {
     public RESTClient(String serverURL) {
         this.serverURL = serverURL;
         this.mapper = new ObjectMapper()
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     public String getServerURL() {
         return serverURL;
     }
+
     public void setServerURL(String serverURL) {
         this.serverURL = serverURL;
     }
@@ -41,37 +42,40 @@ public class RESTClient {
     }
 
     private HttpResponse<String> httpSender(HttpRequest request)
-        throws IOException, InterruptedException {
-    HttpResponse<String> response =
-        getClient().send(request, HttpResponse.BodyHandlers.ofString());
-    int status = response.statusCode();
-    if (status < 200 || status >= 300) {
-        System.err.println("Error HTTP Status Code: " + status);
+            throws IOException, InterruptedException {
+        HttpResponse<String> response = getClient().send(request, HttpResponse.BodyHandlers.ofString());
+        int status = response.statusCode();
+        if (status < 200 || status >= 300) {
+            System.err.println("Error HTTP Status Code: " + status);
+        }
+        return response;
     }
-    return response;
-}
 
     public List<Passenger> buildPassengerListFromResponse(String json) throws IOException {
-        return mapper.readValue(json, new TypeReference<List<Passenger>>() {});
+        return mapper.readValue(json, new TypeReference<List<Passenger>>() {
+        });
     }
 
     public List<Aircraft> buildAircraftListFromResponse(String json) throws IOException {
-        return mapper.readValue(json, new TypeReference<List<Aircraft>>() {});
+        return mapper.readValue(json, new TypeReference<List<Aircraft>>() {
+        });
     }
 
     public List<City> buildCitiesListFromResponse(String json) throws IOException {
-        return mapper.readValue(json, new TypeReference<List<City>>() {});
+        return mapper.readValue(json, new TypeReference<List<City>>() {
+        });
     }
 
     public List<Airport> buildAirportListFromResponse(String json) throws IOException {
-        return mapper.readValue(json, new TypeReference<List<Airport>>() {});
+        return mapper.readValue(json, new TypeReference<List<Airport>>() {
+        });
     }
 
     public List<Passenger> getAllPassengers() {
         List<Passenger> list = new ArrayList<>();
         HttpRequest req = HttpRequest.newBuilder()
-            .uri(URI.create(serverURL + "/passengers"))
-            .GET().build();
+                .uri(URI.create(serverURL + "/passengers"))
+                .GET().build();
         try {
             HttpResponse<String> resp = httpSender(req);
             list = buildPassengerListFromResponse(resp.body());
@@ -84,8 +88,8 @@ public class RESTClient {
     public List<Aircraft> getAllAircraft() {
         List<Aircraft> list = new ArrayList<>();
         HttpRequest req = HttpRequest.newBuilder()
-            .uri(URI.create(serverURL + "/aircrafts"))
-            .GET().build();
+                .uri(URI.create(serverURL + "/aircrafts"))
+                .GET().build();
         try {
             HttpResponse<String> resp = httpSender(req);
             list = buildAircraftListFromResponse(resp.body());
@@ -95,31 +99,47 @@ public class RESTClient {
         return list;
     }
 
-    public List<Airport> getAllAirports(){
+    public List<Airport> getAllAirports() {
         List<Airport> list = new ArrayList<>();
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(serverURL + "/airport"))
-            .GET().build();
-        try{
+                .uri(URI.create(serverURL + "/airport"))
+                .GET().build();
+        try {
             HttpResponse<String> response = httpSender(request);
             list = buildAirportListFromResponse(response.body());
-        } catch (IOException | InterruptedException exception){
+        } catch (IOException | InterruptedException exception) {
             exception.printStackTrace();
         }
         return list;
     }
 
-    public List<Airport> getAirportsByCityId(Long cityId){
+    public List<Airport> getAirportsByCityId(Long cityId) {
         List<Airport> list = new ArrayList<>();
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(serverURL + "/airport/city/" + cityId))
-            .GET()
-            .build();
-        try{
+                .uri(URI.create(serverURL + "/airport/city/" + cityId))
+                .GET()
+                .build();
+        try {
             HttpResponse<String> response = httpSender(request);
             list = buildAirportListFromResponse(response.body());
-        } catch (IOException | InterruptedException exception){
+        } catch (IOException | InterruptedException exception) {
             exception.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Airport> getAirportsByAircraft(long aircraftId) {
+        List<Airport> list = new ArrayList<>();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverURL + "/aircraft/" + aircraftId + "/airports"))
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<String> response = httpSender(request);
+            list = buildAirportListFromResponse(response.body());
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
         return list;
     }
