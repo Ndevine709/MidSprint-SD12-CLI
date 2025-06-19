@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import com.airport.domain.Airport;
 import com.airport.domain.City;
@@ -59,37 +60,51 @@ public class HTTPRestCLIApplication {
 
     
     public static void main(String[] args) {
-        if (args.length < 2) {
-            System.out.println("CLI Usage: java -jar cli-app.jar <serverURL> <queryType>");
-            return;
-        }
+        Scanner scanner = new Scanner(System.in);
 
-        String serverURL = args[0];
-        String queryType = args[1];
+        System.out.println("Enter server URL: ");
+        String serverURL = scanner.nextLine();
 
         HTTPRestCLIApplication cliApp = new HTTPRestCLIApplication();
         RESTClient restClient = new RESTClient(serverURL);
         cliApp.setRestClient(restClient);
 
-        switch (queryType) {
-            case "airportsByCity":
-                cliApp.printAirportsGroupedByCity();
-                break;
+        while (true) {
+            System.out.println("\nChoose an option: ");
+            System.out.println("1. What airports are there in each city?");
+            System.out.println("2. What aircraft has each passenger flown on?");
+            System.out.println("3. What airport do aircrafts take off from and land at?");
+            System.out.println("4. What airports have passengers used?");
+            System.out.println("5. Exit");
 
-            case "aircraftByPassenger":
-                cliApp.printAircraftByPassenger();
-                break;
+            System.out.println("Enter your choice (1-5): ");
+            String choice = scanner.nextLine();
 
-            case "airportsByAircraft":
-                cliApp.printAirportsByAircraft();
-                break;
+            switch (choice) {
+                case "1":
+                    cliApp.printAirportsGroupedByCity();
+                    break;
 
-            case "airportsUsedByPassengers":
-                cliApp.printAirportsUsedByPassengers();
-                break;
-        
-            default:
-                System.out.println("Invalid query type. Valid options include: airportsByCity, aircraftByPassenger, airportsByAircraft, airportsUsedByPassengers");
+                case "2":
+                    cliApp.printAircraftByPassenger();
+                    break;
+
+                case "3":
+                    cliApp.printAirportsByAircraft();
+                    break;
+
+                case "4":
+                    cliApp.printAirportsUsedByPassengers();
+                    break;
+
+                case "5":
+                    System.out.println("Exiting program...");
+                    scanner.close();
+                    return;
+            
+                default:
+                    System.out.println("Invalid choice. Pick from 1-5");
+            }
         }
     }
 }
