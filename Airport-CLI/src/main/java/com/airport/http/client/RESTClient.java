@@ -41,18 +41,15 @@ public class RESTClient {
     }
 
     private HttpResponse<String> httpSender(HttpRequest request)
-            throws IOException, InterruptedException {
-        HttpResponse<String> response =
-            getClient().send(request, HttpResponse.BodyHandlers.ofString());
-        int status = response.statusCode();
-        if (status >= 200 && status < 300) {
-            System.out.println("***** Response Body *****");
-            System.out.println(response.body());
-        } else {
-            System.err.println("Error HTTP Status Code: " + status);
-        }
-        return response;
+        throws IOException, InterruptedException {
+    HttpResponse<String> response =
+        getClient().send(request, HttpResponse.BodyHandlers.ofString());
+    int status = response.statusCode();
+    if (status < 200 || status >= 300) {
+        System.err.println("Error HTTP Status Code: " + status);
     }
+    return response;
+}
 
     public List<Passenger> buildPassengerListFromResponse(String json) throws IOException {
         return mapper.readValue(json, new TypeReference<List<Passenger>>() {});
