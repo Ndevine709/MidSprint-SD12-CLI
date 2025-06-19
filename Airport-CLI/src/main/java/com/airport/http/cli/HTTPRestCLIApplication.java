@@ -6,15 +6,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import com.airport.domain.Aircraft;
 import com.airport.domain.Airport;
 import com.airport.domain.City;
+import com.airport.domain.Passenger;
 import com.airport.http.client.RESTClient;
 
 public class HTTPRestCLIApplication {
     private RESTClient restClient;
 
     public RESTClient getRestClient() {
-        if(restClient == null) {
+        if (restClient == null) {
             restClient = new RESTClient(null);
         }
         return restClient;
@@ -51,14 +53,34 @@ public class HTTPRestCLIApplication {
         }
     }
 
-    // Place holders for group members
-    public void printAircraftByPassenger() {}
+    public void printAircraftByPassenger() {
+        List<Passenger> passengers = getRestClient().getAllPassengers();
 
-    public void printAirportsByAircraft() {}
+        for (Passenger p : passengers) {
+            String name = p.getFirstName() + " " + p.getLastName();
+            System.out.println("Passenger: " + name);
 
-    public void printAirportsUsedByPassengers() {}
+            List<Aircraft> flights = p.getFlights();
+            if (flights == null || flights.isEmpty()) {
+                System.out.println("  - No flights recorded.");
+            } else {
+                for (Aircraft a : flights) {
+                    System.out.println("  - "
+                            + a.getModel()
+                            + " (" + a.getTailNumber() + "), capacity "
+                            + a.getCapacity());
+                }
+            }
+            System.out.println();
+        }
+    }
 
-    
+    public void printAirportsByAircraft() {
+    }
+
+    public void printAirportsUsedByPassengers() {
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -101,7 +123,7 @@ public class HTTPRestCLIApplication {
                     System.out.println("Exiting program...");
                     scanner.close();
                     return;
-            
+
                 default:
                     System.out.println("Invalid choice. Pick from 1-5");
             }
