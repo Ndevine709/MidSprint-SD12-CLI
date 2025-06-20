@@ -104,4 +104,73 @@ class RESTClientTest {
                 () -> assertEquals("C-XYZ", list.get(1).getTailNumber()),
                 () -> assertEquals("Airbus A320", list.get(1).getModel()));
     }
+
+    @Test
+    void getAllAirport_parsesCorrectly(){
+        mockServer.enqueue(new MockResponse()
+            .setResponseCode(200)
+            .setBody("""
+                [
+                  {
+                    "id": 1,
+                    "name":"Toronto Pearson International Airport",
+                    "code": "YYZ",
+                    "city": { "id": 100, "name": "Toronto", "state": "ON", "population": 2700000 }
+                },
+                 {
+                    "id": 2,
+                    "name":"Vancouver International Airport",
+                    "code": "YVR",
+                    "city": { "id": 200, "name": "Vancouver", "state": "BC", "population": 675000 }
+                }   
+            
+            ]
+            """)
+            );
+            List<Airport> airports = client.getAllAirports();
+
+            assertAll("Airports parsed",
+            () -> assertEquals(2, airports.size()),
+            () -> assertEquals("YYZ", airports.get(0).getCode()),
+            () -> assertEquals("Toronto", airports.get(0).getCity().getName()),
+            () -> assertEquals("YVR", airports.get(1).getCode()),
+            () -> assertEquals("Vancouver", airports.get(1).getCity().getName())
+            );
+        }
+
+    @Test
+    void getAirportsByCityId_returnsCorrectAirports(){
+        mockServer.enqueue(new MockResponse()
+            .setResponseCode(200)
+            .setBody("""
+                    [
+                  { 
+                    "id": 3, 
+                    "name": "Halifax Stanfield International Airport",
+                    "code": "YHZ",
+                    "city": { "id": 300, "name": "Halifax", "state": "NS", "population": 431000 }
+                  }
+              ]
+
+            """)
+        );
+
+        List<Airport> airports = client.getAirportsByCityId(300L);
+
+        assertAll("Airports by City ID",
+            () -> assertEquals(1, airports.size()),
+            () -> assertEquals("YHZ", airports.get(0).getCode()),
+            () -> assertEquals("Halifax", airports.get(0).getCity().getName())
+        );
+    }
+
+    @Test
+    void getAllAirports_handlesErrorResponse(){
+        mockServer.enqueue(new MockResponse().setResponseCode(500));
+
+        List<Airport> result = client.getAllAirports();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty(), "Should return an empty list on server error.");
+    }
 }
