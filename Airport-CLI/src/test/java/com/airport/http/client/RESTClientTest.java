@@ -3,7 +3,6 @@ package com.airport.http.client;
 import com.airport.domain.Passenger;
 import com.airport.domain.Aircraft;
 import com.airport.domain.Airport;
-import com.airport.domain.City;
 
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.MockResponse;
@@ -165,6 +164,18 @@ class RESTClientTest {
     }
 
     @Test
+    void getAirportsByCityId_handlesErrorResponse() {
+        mockServer.enqueue(new MockResponse().setResponseCode(404));
+
+        long testCityID = 42;
+        List<Airport> result = client.getAirportsByCityId(testCityID);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty(), "Return an emtpy list on error.");
+
+    }
+
+    @Test
     void getAllAirports_handlesErrorResponse(){
         mockServer.enqueue(new MockResponse().setResponseCode(500));
 
@@ -172,5 +183,39 @@ class RESTClientTest {
 
         assertNotNull(result);
         assertTrue(result.isEmpty(), "Should return an empty list on server error.");
+    }
+
+    @Test
+    void getAirportsByAircraft_returnsCorrectAirports() {
+        mockServer.enqueue(new MockResponse().setResponseCode(200).setBody("""
+                    [
+                  { 
+                    "id": 4, 
+                    "name": "Calgary International Airport",
+                    "code": "YYC",
+                    "city": { "id": 400, "name": "Calgary", "state": "AB", "population": 1231000 }
+                  }
+              ]
+
+            """));
+        long testAircraftID = 42;
+        List<Airport> airports = client.getAirportsByAircraft(testAircraftID);
+
+        assertAll("Airports by Aircraft ID",
+        () -> assertEquals(1, airports.size()),
+        () -> assertEquals("YYC", airports.get(0).getCode()),
+        () -> assertEquals("Calgary", airports.get(0).getCity().getName())
+        );
+    }
+
+    @Test
+    void getAirportsByAircraft_handlesErrorResponse() {
+        mockServer.enqueue(new MockResponse().setResponseCode(500));
+
+        long testAircraftID = 42;
+        List<Airport> result = client.getAirportsByAircraft(testAircraftID);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty(), "Return an empty list on server error.");
     }
 }
