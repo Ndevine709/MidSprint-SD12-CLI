@@ -100,6 +100,40 @@ public class HTTPRestCLIApplication {
     }
 
     public void printAirportsUsedByPassengers() {
+        List<Passenger> allPassengers = getRestClient().getAllPassengers();
+        
+        if (allPassengers.isEmpty()){
+            System.out.println("No passengers found.");
+            return;
+        }
+        
+        for (Passenger passenger : allPassengers){
+            System.out.println("\nPassenger: " + passenger.getFirstName() + " " + passenger.getLastName());
+            
+            List<Aircraft> flights = passenger.getFlights();
+            if (flights == null || flights.isEmpty()){
+                System.out.println(" - No flights recorded.");
+                continue;
+            }
+            
+            System.out.println(" - Airports used:");
+            boolean foundAirports = false;
+
+            for (Aircraft aircraft : flights){
+                List<Airport> airports = aircraft.getAirports();
+                if (airports != null && !airports.isEmpty()){
+                    for (Airport airport : airports){
+                        System.out.printf("   * %s (%s)%n",
+                        airport.getName(),
+                        airport.getCode());
+                        foundAirports = true;
+                    }
+                }
+            }
+            if (!foundAirports){
+            System.out.println("   * (No airports linked to flights)");
+        }
+        } 
     }
 
     public static void main(String[] args) {
