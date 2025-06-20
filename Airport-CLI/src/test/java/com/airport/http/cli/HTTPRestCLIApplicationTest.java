@@ -138,4 +138,46 @@ public class HTTPRestCLIApplicationTest {
         Assertions.assertTrue(output.contains("- Airbus A320 (N54321), capacity 150"));
         Mockito.verify(mockRestClient).getAllPassengers();
     }
+
+    @Test
+    public void testPrintAirportsUsedByPassengers_WithFlightsAndAirports(){
+        Airport airport = new Airport("YUL", "Montreal-Trudeau International", null);
+
+        Aircraft aircraft = new Aircraft();
+        aircraft.setAirports(List.of(airport));
+
+        Passenger passenger = new Passenger();
+        passenger.setFirstName("Alice");
+        passenger.setLastName("Smith");
+        passenger.setFlights(List.of(aircraft));
+
+        Mockito.when(mockRestClient.getAllPassengers()).thenReturn(List.of(passenger));
+
+        Assertions.assertDoesNotThrow(() -> httpRestCLIApplicationTest.printAirportsUsedByPassengers());
+
+        Mockito.verify(mockRestClient).getAllPassengers();
+    }
+
+    @Test
+    public void testPrintAirportsUsedByPassengers_NoFlights(){
+        Passenger passenger = new Passenger();
+        passenger.setFirstName("Bob");
+        passenger.setLastName("Jones");
+        passenger.setFlights(Collections.emptyList());
+
+        Mockito.when(mockRestClient.getAllPassengers()).thenReturn(List.of(passenger));
+
+        Assertions.assertDoesNotThrow(() -> httpRestCLIApplicationTest.printAirportsUsedByPassengers());
+
+        Mockito.verify(mockRestClient).getAllPassengers();
+    }
+
+    @Test
+    public void testPrintAirportsUsedByPassengers_NoPassengers(){
+        Mockito.when(mockRestClient.getAllPassengers()).thenReturn(Collections.emptyList());
+
+        Assertions.assertDoesNotThrow(() -> httpRestCLIApplicationTest.printAirportsUsedByPassengers());
+
+        Mockito.verify(mockRestClient).getAllPassengers();
+    }
 }
